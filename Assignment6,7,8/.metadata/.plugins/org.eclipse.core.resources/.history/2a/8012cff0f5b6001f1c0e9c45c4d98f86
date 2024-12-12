@@ -1,0 +1,11 @@
+package com.sunbeam.Dao;
+
+import com.sunbeam.entities.Player;
+
+public interface PlayerDao {
+
+
+
+
+	String addPlayer(Player player);
+}

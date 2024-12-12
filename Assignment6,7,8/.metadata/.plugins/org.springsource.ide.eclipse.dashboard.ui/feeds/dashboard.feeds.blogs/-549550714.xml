@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Spring]]></title><description><![CDATA[Level up your Java code and explore what Spring can do for you.]]></description><link>https://spring.io</link><generator>GatsbyJS</generator><lastBuildDate>Tue, 10 Dec 2024 14:03:33 GMT</lastBuildDate><item><title><![CDATA[Introducing Spring AI Amazon Bedrock Nova Integration via Converse API]]></title><link>https://spring.io/blog/2024/12/10/spring-ai-amazon-bedrock-nova</link><guid isPermaLink="true">https://spring.io/blog/2024/12/10/spring-ai-amazon-bedrock-nova</guid><dc:creator><![CDATA[tzolov]]></dc:creator><pubDate>Tue, 10 Dec 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;The &lt;a href=&quot;https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html&quot;&gt;Amazon Bedrock Nova&lt;/a&gt; models represent a new generation of foundation models supporting a broad range of use cases, from text and image understanding to video-to-text analysis.&lt;/p&gt;
+&lt;p&gt;With the &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/bedrock-converse.html&quot;&gt;Spring AI Bedrock Converse API&lt;/a&gt; integration, developers can seamlessly connect to these advanced Nova models and build sophisticated conversational applications with minimal effort.&lt;/p&gt;
+&lt;img src=&quot;https://static.spring.io/blog/tzolov/spring-ai-bedrock-nova.jpg&quot; width=&quot;700&quot; align=&quot;center&quot;&gt;
+&lt;p&gt;This blog post introduces the key features of Amazon Nova models, demonstrates their integration with Spring AI&apos;s Bedrock Converse API, and provides practical examples for text, image, video, document processing, and function calling.&lt;/p&gt;
+&lt;h2 id=&quot;what-are-amazon-nova-models&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#what-are-amazon-nova-models&quot; aria-label=&quot;what are amazon nova models permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;What are Amazon Nova Models?&lt;/h2&gt;
+&lt;p&gt;Amazon Nova offers three tiers of models—Nova Pro, Nova Lite, and Nova Micro—to address different performance and cost requirements:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Specification&lt;/th&gt;
+&lt;th&gt;Nova Pro&lt;/th&gt;
+&lt;th&gt;Nova Lite&lt;/th&gt;
+&lt;th&gt;Nova Micro&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Modalities&lt;/td&gt;
+&lt;td&gt;Text, Image, Video-to-text&lt;/td&gt;
+&lt;td&gt;Text, Image, Video-to-text&lt;/td&gt;
+&lt;td&gt;Text&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Model ID&lt;/td&gt;
+&lt;td&gt;amazon.nova-pro-v1:0&lt;/td&gt;
+&lt;td&gt;amazon.nova-lite-v1:0&lt;/td&gt;
+&lt;td&gt;amazon.nova-micro-v1:0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Max tokens&lt;/td&gt;
+&lt;td&gt;300K&lt;/td&gt;
+&lt;td&gt;300K&lt;/td&gt;
+&lt;td&gt;128K&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Nova Pro and Lite support multimodal capabilities, including text, image, and video inputs, while Nova Micro is optimized for text-only interactions at a lower cost.&lt;/p&gt;
+&lt;h2 id=&quot;setting-up-the-integration&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#setting-up-the-integration&quot; aria-label=&quot;setting up the integration permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Setting Up the Integration&lt;/h2&gt;
+&lt;h3 id=&quot;prerequisites&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#prerequisites&quot; aria-label=&quot;prerequisites permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Prerequisites&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;AWS Configuration&lt;/strong&gt;: You need:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS credentials with access to Amazon Bedrock&lt;/li&gt;
+&lt;li&gt;Necessary permissions to use Nova models&lt;/li&gt;
+&lt;li&gt;Models enabled in the &lt;a href=&quot;https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess&quot;&gt;Amazon Bedrock console&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Spring AI Dependency&lt;/strong&gt;:
+Add the Spring AI Bedrock Converse starter to your Spring Boot project:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Maven&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;#x3C;dependency&gt;
+    &amp;#x3C;groupId&gt;org.springframework.ai&amp;#x3C;/groupId&gt;
+    &amp;#x3C;artifactId&gt;spring-ai-bedrock-converse-spring-boot-starter&amp;#x3C;/artifactId&gt;
+&amp;#x3C;/dependency&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Gradle&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-groovy&quot;&gt;dependencies {
+    implementation &apos;org.springframework.ai:spring-ai-bedrock-converse-spring-boot-starter&apos;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Application Configuration&lt;/strong&gt;:
+Configure &lt;code&gt;application.properties&lt;/code&gt; for Amazon Bedrock:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-properties&quot;&gt;spring.ai.bedrock.aws.region=us-east-1
+spring.ai.bedrock.aws.access-key=${AWS_ACCESS_KEY_ID}
+spring.ai.bedrock.aws.secret-key=${AWS_SECRET_ACCESS_KEY}
+spring.ai.bedrock.aws.session-token=${AWS_SESSION_TOKEN}
+
+spring.ai.bedrock.converse.chat.options.model=amazon.nova-pro-v1:0
+
+spring.ai.bedrock.converse.chat.options.temperature=0.8
+spring.ai.bedrock.converse.chat.options.max-tokens=1000
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For more details, refer to the &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/bedrock-converse.html#_chat_properties&quot;&gt;Chat Properties&lt;/a&gt; documentation.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;key-features-of-the-bedrock-nova-integration&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#key-features-of-the-bedrock-nova-integration&quot; aria-label=&quot;key features of the bedrock nova integration permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Key Features of the Bedrock Nova Integration&lt;/h2&gt;
+&lt;h3 id=&quot;1-text-completion&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#1-text-completion&quot; aria-label=&quot;1 text completion permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;1. Text Completion&lt;/h3&gt;
+&lt;p&gt;Text-based chat completion is straightforward:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String response = ChatClient.create(chatModel)
+    .prompt(&quot;Tell me a joke about AI.&quot;)
+    .call()
+    .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;2-multimodal-input&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#2-multimodal-input&quot; aria-label=&quot;2 multimodal input permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;2. Multimodal Input&lt;/h3&gt;
+&lt;p&gt;Nova Pro and Lite support multimodal inputs, enabling text and visual data processing. Spring AI provides a portable &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/multimodality.html&quot;&gt;Multimodal API&lt;/a&gt; that supports Bedrock Nova models.&lt;/p&gt;
+&lt;h4 id=&quot;text--image&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#text--image&quot; aria-label=&quot;text  image permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Text + Image&lt;/h4&gt;
+&lt;p&gt;Nova Pro and Lite support multiple &lt;a href=&quot;https://docs.aws.amazon.com/nova/latest/userguide/modalities-image.html&quot;&gt;image modalities&lt;/a&gt;. These models can analyze images, answer questions about them, classify them, and generate summaries based on provided instructions. They support base64-encoded images in &lt;code&gt;image/jpeg&lt;/code&gt;, &lt;code&gt;image/png&lt;/code&gt;, &lt;code&gt;image/gif&lt;/code&gt;, and &lt;code&gt;image/webp&lt;/code&gt; formats.&lt;/p&gt;
+&lt;p&gt;Example combining user text with an image:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String response = ChatClient.create(chatModel)
+    .prompt()
+    .user(u -&gt; u.text(&quot;Explain what do you see on this picture?&quot;)
+        .media(Media.Format.IMAGE_PNG, new ClassPathResource(&quot;/test.png&quot;)))
+    .call()
+    .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This code processes the &lt;code&gt;test.png&lt;/code&gt; image:
+&lt;img src=&quot;https://docs.spring.io/spring-ai/reference/_images/multimodal.test.png&quot; width=&quot;50&quot; align=&quot;center&quot;&gt; with the text message &lt;code&gt;&quot;Explain what do you see on this picture?&quot;&lt;/code&gt; and generates a response like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The image shows a close-up view of a wire fruit basket containing several pieces of fruit...&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&quot;text--video&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#text--video&quot; aria-label=&quot;text  video permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Text + Video&lt;/h4&gt;
+&lt;p&gt;Amazon Nova Pro/Lite models support a single &lt;a href=&quot;https://docs.aws.amazon.com/nova/latest/userguide/modalities-video.html&quot;&gt;video modality&lt;/a&gt; in the payload, provided either in base64 format or through an Amazon S3 URI.&lt;/p&gt;
+&lt;p&gt;Supported video formats include &lt;code&gt;video/x-matros&lt;/code&gt;, &lt;code&gt;video/quicktime&lt;/code&gt;, &lt;code&gt;video/mp4&lt;/code&gt;, &lt;code&gt;video/webm&lt;/code&gt;, &lt;code&gt;video/x-flv&lt;/code&gt;, &lt;code&gt;video/mpeg&lt;/code&gt;, &lt;code&gt;video/x-ms-wmv&lt;/code&gt;, and &lt;code&gt;image/3gpp&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Example combining user text with a video:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String response = ChatClient.create(chatModel)
+    .prompt()
+    .user(u -&gt; u.text(&quot;Explain what do you see in this video?&quot;)
+        .media(Media.Format.VIDEO_MP4, new ClassPathResource(&quot;/test.video.mp4&quot;)))
+    .call()
+    .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This code processes the &lt;code&gt;test.video.mp4&lt;/code&gt; video &lt;img src=&quot;https://docs.spring.io/spring-ai/reference/_images/test.video.jpeg&quot; width=&quot;50&quot; align=&quot;center&quot;&gt; with the text message &lt;code&gt;&quot;Explain what do you see in this video?&quot;&lt;/code&gt; and generates a response like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The video shows a group of baby chickens, also known as chicks, huddled together on a surface ...&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&quot;text--document&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#text--document&quot; aria-label=&quot;text  document permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Text + Document&lt;/h4&gt;
+&lt;p&gt;Nova Pro/Lite supports &lt;a href=&quot;https://docs.aws.amazon.com/nova/latest/userguide/modalities-document.html&quot;&gt;document modalities&lt;/a&gt; in two variants:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Text document types (txt, csv, html, md, etc.) for text understanding and answering questions based on textual elements&lt;/li&gt;
+&lt;li&gt;Media document types (pdf, docx, xlsx) for vision-based understanding, such as analyzing charts and graphs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Example combining user text with a media document:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String response = ChatClient.create(chatModel)
+    .prompt()
+    .user(u -&gt; u.text(
+            &quot;You are a very professional document summarization specialist. Please summarize the given document.&quot;)
+        .media(Media.Format.DOC_PDF, new ClassPathResource(&quot;/spring-ai-reference-overview.pdf&quot;)))
+    .call()
+    .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This code processes the &lt;code&gt;spring-ai-reference-overview.pdf&lt;/code&gt; document: &lt;img src=&quot;https://docs.spring.io/spring-ai/reference/_images/test.pdf.png&quot; width=&quot;50&quot; align=&quot;center&quot;&gt; with the text message and generates a response like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Introduction:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Spring AI is designed to simplify the development of applications with artificial intelligence (AI) capabilities, aiming to avoid unnecessary complexity....&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;3-function-calling&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#3-function-calling&quot; aria-label=&quot;3 function calling permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;3. Function Calling&lt;/h3&gt;
+&lt;p&gt;Nova models support &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/functions.html&quot;&gt;Tool/Function Calling&lt;/a&gt; for integration with external tools.&lt;/p&gt;
+&lt;img src=&quot;https://docs.spring.io/spring-ai/reference/_images/function-calling-basic-flow.jpg&quot; width=&quot;400&quot; align=&quot;center&quot;&gt;
+&lt;h4 id=&quot;define-a-function&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#define-a-function&quot; aria-label=&quot;define a function permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Define a Function&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Bean
+@Description(&quot;Get the weather in a location. Return temperature in Celsius or Fahrenheit.&quot;)
+public Function&amp;#x3C;WeatherRequest, WeatherResponse&gt; weatherFunction() {
+    return new MockWeatherService();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&quot;use-the-function-in-a-chat-prompt&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#use-the-function-in-a-chat-prompt&quot; aria-label=&quot;use the function in a chat prompt permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Use the Function in a Chat Prompt&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;String response = ChatClient.create(this.chatModel)
+        .prompt(&quot;What&apos;s the weather like in Boston?&quot;)
+        .function(&quot;weatherFunction&quot;) // bean name
+        .inputType(WeatherRequest.class)
+        .call()
+        .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;resources&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#resources&quot; aria-label=&quot;resources permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Resources&lt;/h2&gt;
+&lt;h4 id=&quot;getting-started&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#getting-started&quot; aria-label=&quot;getting started permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Getting Started&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.spring.io/spring-ai/reference/index.html&quot;&gt;Spring AI Documentation&lt;/a&gt; - Comprehensive guide to Spring AI&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/bedrock-converse.html&quot;&gt;Spring AI Bedrock Converse API Guide&lt;/a&gt; - Detailed API documentation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;amazon-bedrock-resources&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#amazon-bedrock-resources&quot; aria-label=&quot;amazon bedrock resources permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Amazon Bedrock Resources&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html&quot;&gt;Amazon Bedrock Nova Documentation&lt;/a&gt; - Official Nova models documentation&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://us-east-1.console.aws.amazon.com/bedrock/home&quot;&gt;Amazon Bedrock Console&lt;/a&gt; - Manage and monitor your Bedrock resources&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html&quot;&gt;Nova Model Capabilities&lt;/a&gt; - Detailed information about Nova model parameters and capabilities&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;code-examples&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#code-examples&quot; aria-label=&quot;code examples permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Code Examples&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/tzolov/spring-ai-bedrock-nova-demo&quot;&gt;Spring AI Bedrock Nova Demo&lt;/a&gt; - Complete example project showcasing integration features&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-ai/blob/main/models/spring-ai-bedrock-converse/src/test/java/org/springframework/ai/bedrock/converse/client/BedrockNovaChatClientIT.java&quot;&gt;BedrockNovaChatClientIT.java&lt;/a&gt; - Integration test examples&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-ai/tree/main/spring-ai-samples&quot;&gt;Spring AI Samples Repository&lt;/a&gt; - Additional code samples and use cases&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;tanzu-ai-server&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#tanzu-ai-server&quot; aria-label=&quot;tanzu ai server permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Tanzu AI Server&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://blogs.vmware.com/tanzu/broadcom-announces-the-general-availability-of-vmware-tanzu-platform-10-making-it-easier-for-customers-to-build-and-launch-new-applications-in-the-private-cloud/&quot;&gt;VMware Tanzu Platform 10&lt;/a&gt; integrates Amazon Bedrock Nova models through the VMware Tanzu AI Server, powered by Spring AI.
+This integration provides:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Enterprise-Grade AI Deployment&lt;/strong&gt;: Production-ready solution for deploying AI applications within your VMware Tanzu environment&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Simplified Model Access&lt;/strong&gt;: Streamlined access to Amazon Bedrock Nova models through a unified interface&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Security and Governance&lt;/strong&gt;: Enterprise-level security controls and governance features&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Scalable Infrastructure&lt;/strong&gt;: Built on Spring AI, the integration supports for scalable deployment of AI applications while maintaining high performance&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For more information about deploying AI applications with Tanzu AI Server, visit the &lt;a href=&quot;https://www.vmware.com/solutions/app-platform/ai&quot;&gt;VMware Tanzu AI documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;conclusion&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#conclusion&quot; aria-label=&quot;conclusion permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;The integration of Spring AI with Amazon Bedrock Nova models via the Converse API enables powerful capabilities for building advanced conversational applications. Nova Pro and Lite provide comprehensive tools for developing multimodal experiences across text, images, videos, and documents. Function calling extends these capabilities further by enabling interaction with external tools and services.&lt;/p&gt;
+&lt;p&gt;Start building advanced AI applications with Nova models and Spring AI today!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[This Week in Spring - December 10th, 2024]]></title><link>https://spring.io/blog/2024/12/10/this-week-in-spring-december-10th-2024</link><guid isPermaLink="true">https://spring.io/blog/2024/12/10/this-week-in-spring-december-10th-2024</guid><dc:creator><![CDATA[joshlong]]></dc:creator><pubDate>Tue, 10 Dec 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Hi, Spring fans! Welcome to another installment of &lt;em&gt;This Week in Spring&lt;/em&gt;! As I write this I am in the southern hemisphere (it&apos;s summer down here!), in Brisbane, waiting to board a plane for Sydney. It&apos;s been a ton of fun!&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I did a video looking &lt;a href=&quot;https://youtu.be/DUIpWkl_ixE?feature=shared&quot;&gt;at the latest-and-greatest in Spring Framework 6.2&lt;/a&gt; - check it out!&lt;/li&gt;
+&lt;li&gt;I did another video looking at &lt;a href=&quot;https://youtu.be/DUIpWkl_ixE?feature=shared&quot;&gt;the latest-and-greatest in Spring Data 2024.1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;in last week&apos;s installment of &lt;em&gt;A Bootiful Podcast&lt;/em&gt;, I talk to &lt;a href=&quot;https://spring.io/blog/2024/12/05/a-bootiful-podcast-rob-winch&quot;&gt;Spring Security lead Rob Winch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;to learn more about Spring AI&apos;s new audio features, check out &lt;a href=&quot;https://spring.io/blog/2024/12/05/spring-ai-audio-modality&quot;&gt;this blog by Christian Tzolov&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://spring.io/blog/2024/12/04/spring-tools-4-27-0-released&quot;&gt;Spring Tools 4.27.0 has been released&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;this is an interesting read from Karanbir Singh &lt;a href=&quot;https://neuw.medium.com/spring-boot-3-4-x-oauth2-client-using-restclient-no-reactive-dependency-20802fad7441&quot;&gt;on Spring Boot 3.4x&apos;s OAuth2 client using &lt;code&gt;RestClient&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;WireMock now has an &lt;a href=&quot;https://www.wiremock.io/post/wiremock-now-has-an-official-spring-boot-integration&quot;&gt;official Spring Boot integration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;this video by BellSoft&apos;s &lt;a href=&quot;https://www.youtube.com/watch?v=MjvCBErBsaA&quot;&gt;Catherine Edelveis on using CRaC with Spring Boot&lt;/a&gt; is good&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://x.com/christzolov/status/1865678719756435827?s=12&quot;&gt;implementing Spring AI to create a voice-based chat assistant is trivial&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cool: &lt;a href=&quot;https://www.youtube.com/watch?v=mWXTf27RmWc&quot;&gt;build a JavaFX app with Spring AI&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;I missed this last month: &lt;a href=&quot;https://blog.csdn.net/qq_21903999/article/details/141361173?spm=1001.2100.3001.7377&amp;#x26;utm_medium=distribute.pc_feed_blog_category.none-task-blog-classify_tag-1-141361173-null-null.nonecase&amp;#x26;depth_1-utm_source=distribute.pc_feed_blog_category.none-task-blog-classify_tag-1-141361173-null-null.nonecase&quot;&gt;a Chinese language tutorial on configuring Apache ShardingSphere JDBC 5.5.0 and Spring&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item><item><title><![CDATA[A Bootiful Podcast: Spring Security lead Rob Winch on the amazing Spring Security 6.4 release]]></title><link>https://spring.io/blog/2024/12/05/a-bootiful-podcast-rob-winch</link><guid isPermaLink="true">https://spring.io/blog/2024/12/05/a-bootiful-podcast-rob-winch</guid><dc:creator><![CDATA[joshlong]]></dc:creator><pubDate>Thu, 05 Dec 2024 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Hi, Spring fans! In this installment, we&apos;ll talk to the amazing Rob Winch, lead of Spring Security 6.4, about the jam-packed new release! #spring #springboot #security #java&lt;/p&gt;
+&lt;iframe title=&quot;project lead Rob Winch on the amazing new Spring Security 6.4 release&quot; allowtransparency=&quot;true&quot; height=&quot;300&quot; width=&quot;100%&quot; style=&quot;border: none; min-width: min(100%, 430px);height:300px;&quot; scrolling=&quot;no&quot; data-name=&quot;pb-iframe-player&quot; src=&quot;https://www.podbean.com/player-v2/?from=embed&amp;i=qbdhw-175e687-pb&amp;square=1&amp;share=1&amp;download=1&amp;fonts=Arial&amp;skin=1&amp;font-color=&amp;rtl=0&amp;logo_link=&amp;btn-skin=7&amp;size=300&quot; loading=&quot;lazy&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content:encoded></item><item><title><![CDATA[Audio Multimodality: Expanding AI Interaction with Spring AI and OpenAI]]></title><link>https://spring.io/blog/2024/12/05/spring-ai-audio-modality</link><guid isPermaLink="true">https://spring.io/blog/2024/12/05/spring-ai-audio-modality</guid><dc:creator><![CDATA[tzolov]]></dc:creator><pubDate>Thu, 05 Dec 2024 00:00:00 GMT</pubDate><content:encoded>&lt;blockquote&gt;
+&lt;p&gt;This blog post is co-authored by our great contributor &lt;a href=&quot;https://www.linkedin.com/in/vitalethomas/&quot;&gt;Thomas Vitale&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;OpenAI provides specialized models for &lt;code&gt;speech-to-text&lt;/code&gt; and &lt;code&gt;text-to-speech&lt;/code&gt; conversion, recognized for their performance and cost-efficiency. Spring AI integrates these capabilities via &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/audio/transcriptions/openai-transcriptions.html&quot;&gt;Voice-to-Text&lt;/a&gt; and &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/audio/speech/openai-speech.html&quot;&gt;Text-to-Speech (TTS)&lt;/a&gt;.&lt;/p&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/t70PITMzrxU?si=u5sINSyETHfmILdJ&quot; title=&quot;YouTube video player&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&quot; referrerpolicy=&quot;strict-origin-when-cross-origin&quot; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;p&gt;The new &lt;a href=&quot;https://platform.openai.com/docs/guides/audio&quot;&gt;Audio Generation&lt;/a&gt; feature (&lt;code&gt;gpt-4o-audio-preview&lt;/code&gt;) goes further, enabling mixed input and output modalities. Audio inputs can contain richer data than text alone. Audio can convey nuanced information like tone and inflection, and together with the audio outputs it enables asynchronous &lt;code&gt;speech-to-speech&lt;/code&gt; interactions.
+Additionally, this new multimodality opens up possibilities for innovative applications, such as structured data extraction. Developers can extract structured information not just from simple text, but also from images and audio, building complex, structured objects seamlessly.&lt;/p&gt;
+&lt;h2 id=&quot;spring-ai-audio-integrations&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#spring-ai-audio-integrations&quot; aria-label=&quot;spring ai audio integrations permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Spring AI Audio Integrations&lt;/h2&gt;
+&lt;p&gt;The Spring AI &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/multimodality.html&quot;&gt;Multimodality Message API&lt;/a&gt; simplifies the integration of multimodal capabilities with various AI models.&lt;/p&gt;
+&lt;img src=&quot;https://docs.spring.io/spring-ai/reference/_images/spring-ai-message-api.jpg&quot; width=&quot;600&quot; align=&quot;center&quot;&gt;
+&lt;p&gt;Now it fully supports OpenAI’s &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html#_audio&quot;&gt;Audio Input&lt;/a&gt; and &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html#_output_audio&quot;&gt;Audio Output&lt;/a&gt; modalities, thanks in large part to community member &lt;a href=&quot;https://www.linkedin.com/in/vitalethomas/&quot;&gt;Thomas Vitale&lt;/a&gt;, who contributed to this feature&apos;s development.&lt;/p&gt;
+&lt;h3 id=&quot;setup&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#setup&quot; aria-label=&quot;setup permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Setup&lt;/h3&gt;
+&lt;p&gt;Follow the &lt;a href=&quot;https://docs.spring.io/spring-ai/reference/api/chat/openai-chat.html&quot;&gt;Spring AI-OpenAI&lt;/a&gt; integration documentation to prepare your environment.&lt;/p&gt;
+&lt;h3 id=&quot;audio-input&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#audio-input&quot; aria-label=&quot;audio input permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Audio Input&lt;/h3&gt;
+&lt;p&gt;OpenAI’s &lt;a href=&quot;https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages&quot;&gt;User Message API&lt;/a&gt; accepts base64-encoded audio files within messages using the &lt;a href=&quot;https://github.com/spring-projects/spring-ai/blob/main/spring-ai-core/src/main/java/org/springframework/ai/chat/messages/Media.java&quot;&gt;Media&lt;/a&gt; type. Supported formats include &lt;code&gt;audio/mp3&lt;/code&gt; and &lt;code&gt;audio/wav&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Example: Adding audio to an input prompt:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Prepare the audio resource
+var audioResource = new ClassPathResource(&quot;speech1.mp3&quot;);
+
+// Create a user message with audio and send it to the chat model
+String response = chatClient.prompt()
+        .user(u -&gt; u.text(&quot;What is this recording about?&quot;)
+                    .media(MimeTypeUtils.parseMimeType(&quot;audio/mp3&quot;), audioResource))                    
+        .options(OpenAiChatOptions.builder()
+            .withModel(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW).build())
+        .call()
+        .content();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;audio-output-generation&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#audio-output-generation&quot; aria-label=&quot;audio output generation permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Audio Output Generation&lt;/h3&gt;
+&lt;p&gt;The OpenAI &lt;a href=&quot;https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages&quot;&gt;Assistant Message API&lt;/a&gt; can return base64-encoded audio files using the &lt;code&gt;Media&lt;/code&gt; type.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Example: Generating audio output:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;// Generate an audio response
+ChatResponse response = chatClient
+    .prompt(&quot;Tell me a joke about the Spring Framework&quot;)
+    .options(OpenAiChatOptions.builder()
+        .withModel(OpenAiApi.ChatModel.GPT_4_O_AUDIO_PREVIEW)
+        .withOutputModalities(List.of(&quot;text&quot;, &quot;audio&quot;))
+        .withOutputAudio(new AudioParameters(Voice.ALLOY, AudioResponseFormat.WAV))
+        .build())
+    .call()
+    .chatResponse();
+
+// Access the audio transcript
+String audioTranscript = response.getResult().getOutput().getContent();
+
+// Retrieve the generated audio
+byte[] generatedAudio = response.getResult().getOutput().getMedia().get(0).getDataAsByteArray();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To generate audio output, specify the audio modality in &lt;code&gt;OpenAiChatOptions&lt;/code&gt;. Use the &lt;code&gt;AudioParameters&lt;/code&gt; class to customize the voice and the audio format.&lt;/p&gt;
+&lt;h2 id=&quot;voice-chatbot-demo&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#voice-chatbot-demo&quot; aria-label=&quot;voice chatbot demo permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/tzolov/voice-assistant-chatbot&quot;&gt;Voice ChatBot Demo&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;This example demonstrates building an interactive chatbot using Spring AI that supports input and output audio. It shows how AI can enhance user interaction with natural-sounding audio responses.&lt;/p&gt;
+&lt;h3 id=&quot;setup-1&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#setup-1&quot; aria-label=&quot;setup 1 permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Setup&lt;/h3&gt;
+&lt;p&gt;Add the Spring AI OpenAI starter:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;#x3C;dependency&gt;
+    &amp;#x3C;groupId&gt;org.springframework.ai&amp;#x3C;/groupId&gt;
+    &amp;#x3C;artifactId&gt;spring-ai-openai-spring-boot-starter&amp;#x3C;/artifactId&gt;
+&amp;#x3C;/dependency&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Configure the API key, model name, and output audio modality in &lt;code&gt;application.properties&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;spring.main.web-application-type=none
+
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.options.model=gpt-4o-audio-preview
+
+spring.ai.openai.chat.options.output-modalities=text,audio
+spring.ai.openai.chat.options.output-audio.voice=ALLOY
+spring.ai.openai.chat.options.output-audio.format=WAV
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;implementation&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#implementation&quot; aria-label=&quot;implementation permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Implementation&lt;/h3&gt;
+&lt;p&gt;The Java implementation of the voice chatbot, detailed below, creates a conversational AI assistant using audio input and output. It leverages Spring AI&apos;s integration with OpenAI models to enable seamless interactions with users.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;VoiceAssistantApplication&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;VoiceAssistantApplication&lt;/code&gt; serves as the main application.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;code&gt;CommandLineRunner&lt;/code&gt; bean initializes the chatbot:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;ChatClient&lt;/code&gt; is configured using the &lt;code&gt;systemPrompt&lt;/code&gt; for contextual understanding and an in-memory chat memory for conversation history.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;Audio&lt;/code&gt; utility is used to record voice input from the user and play back audio responses generated by the AI.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Chat Loop:&lt;/strong&gt; Inside the loop:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Voice Recording:&lt;/strong&gt; The &lt;code&gt;audio.startRecording()&lt;/code&gt; and &lt;code&gt;audio.stopRecording()&lt;/code&gt; methods handle the recording process, pausing for user input.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Processing AI Response:&lt;/strong&gt; The user message is sent to the AI model via &lt;code&gt;chatClient.prompt()&lt;/code&gt;. The audio data is encapsulated in the &lt;code&gt;Media&lt;/code&gt; object.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Response Handling:&lt;/strong&gt; The AI-generated response is retrieved as text and played back as audio using the &lt;code&gt;Audio.play()&lt;/code&gt; method.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Refer to the following code snippet for the implementation:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-java&quot;&gt;@Bean
+public CommandLineRunner chatBot(ChatClient.Builder chatClientBuilder,
+        @Value(&quot;${chatbot.prompt:classpath:/marvin.paranoid.android.txt}&quot;) Resource systemPrompt) {
+    return args -&gt; {
+
+        var chatClient = chatClientBuilder.defaultSystem(systemPrompt)
+            .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+            .build();
+
+        try (Scanner scanner = new Scanner(System.in)) {
+
+            Audio audio = new Audio();
+
+            while (true) {                    
+                audio.startRecording();
+                System.out.print(&quot;Recording your question ... press &amp;#x3C;Enter&gt; to stop! &quot;);
+                scanner.nextLine();
+                audio.stopRecording();
+
+                System.out.print(&quot;PROCESSING ... &quot;);
+
+                AssistantMessage response = chatClient.prompt()
+                    .messages(new UserMessage(&quot;Please answer the questions in the audio input&quot;,
+                            new Media(MediaType.parseMediaType(&quot;audio/wav&quot;),
+                                    new ByteArrayResource(audio.getLastRecording()))))
+                    .call()
+                    .chatResponse()
+                    .getResult()
+                    .getOutput();
+
+                System.out.println(&quot;ASSISTANT: &quot; + response.getContent());
+                Audio.play(response.getMedia().get(0).getDataAsByteArray());
+            }
+        }
+    };
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;Audio&lt;/code&gt; utility, for capturing and playing back audio, is a single class leveraging the plain &lt;code&gt;Java Sound API&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; ???????? ???? ???????  ?? ????     ??? ?????                                    
+??   ?? ???? ??  ?  ????????       ?? ??  ?                                      
+ ???????? ?????  ?  ?? ????????    ?????  ?                                      
+???????   ?? ?????????  ???????    ?? ???????                                    
+????  ??? ????  ??? ??  ?? ??? ?????????      ??? ??  ?????? ????  ??? ????????? 
+?? ???? ???? ???? ?????????? ??  ?  ??  ?    ?? ??????????  ??? ???? ??  ?  ??  ?
+???? ????????????????? ????? ??  ?  ??  ?    ??????? ?????  ???????? ??  ?  ??  ?
+??   ?? ???? ???? ????  ?????????????????    ?? ????  ????????? ?????????????????
+
+2024-12-01T11:00:11.274+01:00  INFO 31297 --- [voice-assistant-chatbot] [           main] s.a.d.a.m.VoiceAssistantApplication      : Started VoiceAssistantApplication in 0.827 seconds (process running for 1.054)
+
+Recording your question ... press &amp;#x3C;Enter&gt; to stop!
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The complete demo is available on GitHub: &lt;a href=&quot;https://github.com/tzolov/voice-assistant-chatbot&quot;&gt;voice-assistant-chatbot&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;important-considerations&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#important-considerations&quot; aria-label=&quot;important considerations permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Important Considerations&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/tzolov/voice-assistant-chatbot&quot;&gt;One hour of&lt;/a&gt; audio input is roughly equivalent to 128k tokens.&lt;/li&gt;
+&lt;li&gt;The model currently supports &lt;code&gt;modalities = [&quot;text&quot;, &quot;audio&quot;]&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Future updates may offer more flexible modality controls.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;conclusion&quot; style=&quot;position:relative;&quot;&gt;&lt;a href=&quot;#conclusion&quot; aria-label=&quot;conclusion permalink&quot; class=&quot;anchor before&quot;&gt;&lt;svg aria-hidden=&quot;true&quot; focusable=&quot;false&quot; height=&quot;16&quot; version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; width=&quot;16&quot;&gt;&lt;path fill-rule=&quot;evenodd&quot; d=&quot;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/a&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;gpt-4o-audio-preview&lt;/code&gt; model unlocks new possibilities for dynamic audio interactions, enabling developers to build rich, AI-powered audio applications.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Disclaimer: API capabilities and features may evolve. Refer to the latest OpenAI and Spring AI documentation for updates.&lt;/em&gt;&lt;/p&gt;</content:encoded></item></channel></rss>

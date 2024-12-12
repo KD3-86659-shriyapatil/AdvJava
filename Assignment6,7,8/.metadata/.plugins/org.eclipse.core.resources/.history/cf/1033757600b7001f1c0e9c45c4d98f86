@@ -1,0 +1,26 @@
+package com.sunbeam.tester;
+
+import java.util.Scanner;
+
+import org.hibernate.SessionFactory;
+
+import com.sunbeam.Dao.PlayerDao;
+import com.sunbeam.Dao.PlayerDaoImpl;
+import com.sunbeam.Dao.TeamDao;
+import com.sunbeam.Dao.TeamDaoImpl;
+import com.sunbeam.entities.Player;
+import com.sunbeam.utils.HibernateUtils;
+
+public class DisplayTeamNPlayerDetails {
+	public static void main(String[] args) {
+		try(SessionFactory sf = HibernateUtils.getSessionFactory();
+				Scanner sc =new Scanner(System.in)){
+			TeamDao teamDao = new TeamDaoImpl();
+			sysout'
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

@@ -1,0 +1,25 @@
+package com.sunbeam.tester;
+
+import java.util.Scanner;
+
+import org.hibernate.SessionFactory;
+
+import com.sunbeam.Dao.PlayerDao;
+import com.sunbeam.Dao.PlayerDaoImpl;
+import com.sunbeam.utils.HibernateUtils;
+
+public class RemovedPlayerData {
+
+	public static void main(String[] args) {
+		try (SessionFactory sf = HibernateUtils.getSessionFactory();
+				Scanner sc=new Scanner(System.in)) {
+			PlayerDao playerdao=new PlayerDaoImpl();
+			System.out.println("Enter team id n blog id");			
+			System.out.println(playerdao.removeplayer(sc.nextLong(),sc.nextLong()));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}

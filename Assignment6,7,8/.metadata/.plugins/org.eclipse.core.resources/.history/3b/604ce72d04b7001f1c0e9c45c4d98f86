@@ -1,0 +1,14 @@
+package com.sunbeam.Dao;
+
+import com.sunbeam.entities.Player;
+
+public interface PlayerDao {
+
+    String addPlayer(Long teamId,Player player);
+
+	Player getTeamPlayerDetails(long nextLong);
+
+	String removeplayer(long nextLong, long nextLong2);
+
+
+}
