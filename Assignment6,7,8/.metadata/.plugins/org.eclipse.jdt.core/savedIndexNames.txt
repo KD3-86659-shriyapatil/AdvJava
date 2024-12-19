@@ -1,7 +1,0 @@
-INDEX VERSION 1.131+E:\selfstudy\Day08\.metadata\.plugins\org.eclipse.jdt.core
-3586421577.index
-1865797976.index
-618459102.index
-417273378.index
-1724857382.index
-219629762.index
